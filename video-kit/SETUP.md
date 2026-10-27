@@ -53,6 +53,9 @@ Estilos de legenda em `scripts/kit.py`: **A** caixa alta 2–3 palavras, **B** f
 | 7 | 06/11 | Jiaxing |
 | 8 | 07/11 | Jiaxing → Xangai |
 
+Antes do Dia 1: vídeo de embarque com `"tag_day": "Embarque", "place": "São Paulo"`
+(selo "EMBARQUE · SÃO PAULO"). `tag_day` substitui "Dia N" em qualquer vídeo fora do roteiro.
+
 ## Aprovações (27/10/2026)
 
 | Recurso | Decisão |
@@ -67,7 +70,7 @@ Estilos de legenda em `scripts/kit.py`: **A** caixa alta 2–3 palavras, **B** f
 | Tradução | PT pequeno em cima, EN grande embaixo (`.ass` escrito à mão, passado em `"captions"`) |
 | Encerramento | Logo + "Missão China 2026 · SCALE IA" + @sebraestartups e @alexsouzanet, 2,8 s |
 | Música | **Nenhuma no arquivo.** Adicionada no app do Instagram (biblioteca livre de direitos), 10–15% do volume da voz |
-| Duração | 30, 60 ou 90 s |
+| Duração | Alvo pedido pelo usuário (30, 60 ou 90 s são os formatos usuais, não um limite) |
 
 ## Fluxo de cada vídeo
 

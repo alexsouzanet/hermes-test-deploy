@@ -153,7 +153,7 @@ def main() -> None:
     shutil.rmtree(work, ignore_errors=True)
     work.mkdir(parents=True)
     tmp = Path(tempfile.mkdtemp())
-    place_tag = f"Dia {cfg['day']} · {cfg['place']}"
+    place_tag = f"{cfg.get('tag_day', f'Dia {cfg['day']}')} · {cfg['place']}"
 
     # 1. Talk ranges → body.mp4, and caption cues on the body timeline (Rule 5).
     seg_paths, cue_words, offset = [], [], 0.0
@@ -181,7 +181,7 @@ def main() -> None:
     kit.logo_bug_frame("B").save(logo)
     inputs += ["-loop", "1", "-t", f"{body_dur:.3f}", "-i", str(logo)]
     tag_dir = work / "tag"
-    kit.location_tag_frames(cfg.get("tag_day", f"Dia {cfg['day']}"), cfg["place"], min(6.0, body_dur - 0.2), tag_dir)
+    kit.location_tag_frames(place_tag.split(' · ')[0], cfg["place"], min(6.0, body_dur - 0.2), tag_dir)
     inputs += ["-itsoffset", "0.2", "-framerate", "30", "-i", str(tag_dir / "f_%04d.png")]
     overlays = [("1", "1"), ("2", "gte(t,0.2)")]
     for k, nc in enumerate(cfg.get("name_cards", [])):
