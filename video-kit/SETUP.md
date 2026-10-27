@@ -30,12 +30,12 @@ Edição feita pelo skill [video-use](https://github.com/browser-use/video-use) 
 | Formato | 1080×1920, 30 fps, H.264, áudio AAC 48 kHz, −14 LUFS / −1 dBTP |
 | Cores | Azul escuro `#005EB8`, azul claro `#40B9FF`, branco |
 | Fonte | Inter (ExtraBold / Black nos títulos e legendas) |
-| Logo | `horizontal_branco.png`, 300 px, canto superior direito, 92% opacidade, sombra suave |
-| Selo de local | Canto superior esquerdo, "DIA N · CIDADE", entra deslizando em 0,45 s |
+| Logo | `horizontal_branco.png`, 300 px, canto superior direito (y=140, mesma linha do selo), 92% opacidade, sombra suave |
+| Selo de local | Canto superior esquerdo (y=140), "DIA N · CIDADE", entra deslizando em 0,45 s |
 | Cartão de nome | Acima da legenda (y≈1030), nome + cargo · organização, entra em 0,5 s, sai em 0,4 s |
 | Legendas | Linha de base a 30% da base (y=1340). Largura máx. 860 px; texto maior encolhe sozinho |
 | Texto da legenda | Português escrito: "Cê"→"Você", "dum"→"de um". O áudio fica como foi falado |
-| Zona segura Reels | Nada importante acima de y=250, abaixo de y=1500 nem nos 140 px da direita |
+| Zona segura Reels | Selo e logo ficam em y=140, acima do rosto (pedido do usuário). Na aba Reels, a barra do app pode encostar neles. Nada importante abaixo de y=1500 nem nos 140 px da direita |
 
 Estilos de legenda em `scripts/kit.py`: **A** caixa alta 2–3 palavras, **B** frase com caixa escura,
 **C** karaokê com a palavra falada em `#40B9FF`, **PT+EN** para traduções.

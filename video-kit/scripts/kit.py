@@ -21,6 +21,8 @@ LOGOS = Path(__file__).resolve().parent.parent / "assets" / "logos"
 
 # Instagram Reels safe area (UI covers top ~220px, bottom ~420px, right rail ~140px).
 SAFE_TOP = 250
+TOP_BAR_Y = 140             # tag + logo row: close to the top edge, clear of the face (approved 27/10)
+TAG_H = 76
 CAPTION_Y = 1340              # caption baseline, ~30% up from the bottom
 
 
@@ -243,7 +245,7 @@ def logo_bug_frame(variant: str = "B") -> Image.Image:
     """Full-frame RGBA with the logo top-right inside the safe area."""
     bug = logo_bug(variant)
     f = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    f.alpha_composite(bug, (W - bug.width - 40, SAFE_TOP - 24))
+    f.alpha_composite(bug, (W - bug.width - 40, TOP_BAR_Y + (TAG_H - (bug.height - 48)) // 2 - 24))
     return f
 
 
@@ -260,7 +262,7 @@ def location_tag_frames(day: str, place: str, dur: float, out_dir: Path) -> int:
     day_t, place_t = day.upper(), place.upper()
     dw = f_day.getlength(day_t)
     pw = f_place.getlength(place_t)
-    h = 76
+    h = TAG_H
     pill_w = int(28 + 34 + 16 + dw + 26 + pw + 30)
     n = int(round(dur * FPS))
     for i in range(n):
@@ -280,7 +282,7 @@ def location_tag_frames(day: str, place: str, dur: float, out_dir: Path) -> int:
         x = int(48 - (1 - k) * (pill_w + 60))
         alpha = layer.getchannel("A").point(lambda v: int(v * fade))
         layer.putalpha(alpha)
-        img.alpha_composite(layer, (x, SAFE_TOP))
+        img.alpha_composite(layer, (x, TOP_BAR_Y))
         img.save(out_dir / f"f_{i:04d}.png", compress_level=1)
     return n
 
