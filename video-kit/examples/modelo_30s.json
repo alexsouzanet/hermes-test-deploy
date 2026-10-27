@@ -1,0 +1,17 @@
+{
+  "name": "modelo_30s",
+  "videos_dir": "/root/footage/catalogo",
+  "day": 3,
+  "place": "Hangzhou",
+  "title": {"kicker": "Missão China 2026", "title": "Startup\nSummit\nWeek"},
+  "ranges": [
+    {"source": "IMG_7707", "start": 1.69, "end": 4.88},
+    {"source": "IMG_7707", "start": 12.95, "end": 22.02},
+    {"source": "IMG_7707", "start": 22.17, "end": 33.56},
+    {"source": "IMG_7707", "start": 33.73, "end": 36.50}
+  ],
+  "name_cards": [{"name": "Alexandre de Souza", "role": "Gerente de Inovação · Sebrae/SC", "at": 0.8}],
+  "isolate_voice": false,
+  "auto_zoom": true,
+  "captions": "C"
+}

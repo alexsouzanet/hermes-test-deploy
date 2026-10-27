@@ -53,15 +53,28 @@ Estilos de legenda em `scripts/kit.py`: **A** caixa alta 2–3 palavras, **B** f
 | 7 | 06/11 | Jiaxing |
 | 8 | 07/11 | Jiaxing → Xangai |
 
-## Aprovações
+## Aprovações (27/10/2026)
 
-Escolhas do usuário a partir do vídeo-catálogo (`examples/build_catalog.py`).
-Atualizar esta seção quando ele responder.
+| Recurso | Decisão |
+|---|---|
+| Abertura | Cartão de título (símbolo, kicker, título em até 3 linhas, selo do dia), 2,4 s |
+| Legenda | **C · karaokê**: caixa alta, 2–3 palavras, palavra falada em `#40B9FF` |
+| Selo de local | Sim, nos primeiros 6 s da fala |
+| Zoom de corte | Sim, alterna 100% / 118% nas pausas, trechos de no mínimo 2,2 s |
+| Cartão de nome | Sim, para quem fala (lista no briefing do Drive) |
+| Cor | **Neutra** (correção automática sutil, ±8%) |
+| Isolamento de voz | Sim, quando houver ruído (`"isolate_voice": true`; precisa de trechos ≥ 4,6 s) |
+| Tradução | PT pequeno em cima, EN grande embaixo (`.ass` escrito à mão, passado em `"captions"`) |
+| Encerramento | Logo + "Missão China 2026 · SCALE IA" + @sebraestartups e @alexsouzanet, 2,8 s |
+| Música | **Nenhuma no arquivo.** Adicionada no app do Instagram (biblioteca livre de direitos), 10–15% do volume da voz |
+| Duração | 30, 60 ou 90 s |
 
-- Legenda: _pendente_
-- Abertura com cartão de título: _pendente_
-- Zoom de corte: _pendente_
-- Cor: _pendente_ (padrão provisório: neutra)
-- Isolamento de voz: _pendente_
-- Música: _pendente_
-- Encerramento: _pendente_
+## Fluxo de cada vídeo
+
+1. Baixar os brutos do Drive para `/root/footage/<pasta>/`.
+2. Transcrever: `python ~/Developer/video-use/helpers/transcribe_batch.py /root/footage/<pasta>`.
+3. Ler `edit/takes_packed.md` (gerado por `pack_transcripts.py`), propor o corte e **esperar aprovação**.
+4. Escrever o JSON do Reel (modelo: `examples/modelo_30s.json`) e rodar:
+   `~/Developer/video-use/.venv/bin/python scripts/make_reel.py reel.json` (use `--draft` para conferir cortes).
+5. Conferir quadros nos cortes, legendas e volume (−14 LUFS) antes de enviar.
+6. Entregar o MP4 na conversa e, se pedido, salvar na pasta **video-use** do Drive.
