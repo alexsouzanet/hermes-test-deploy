@@ -91,3 +91,14 @@ Opções do JSON além do modelo (ver `examples/embarque_60s.json`):
 - `"isolate_voice": true`: isola a voz do arquivo inteiro uma vez (cache em `edit/isolated/`) e depois corta.
 - `"blur_band": [0.72, 0.84]`: desfoca uma faixa da imagem (fração da altura), para esconder legenda antiga gravada no vídeo.
 - `"tag_day"`: texto no lugar de "Dia N" (ex.: "Embarque").
+
+## Histórico e pendências (27/10/2026)
+
+- Testes feitos com vídeos de 2025 (360×640, baixados do Instagram): embarque (aprovado) e Alibaba.
+- Feedback do usuário no Alibaba v1: cortes secos/truncados e voz abafada. Corrigido na v2 (cortes só entre frases,
+  folga para respirar, 25% de som original sob a voz isolada). Usar sempre esse padrão.
+- Selo e logo foram subidos para y=140 a pedido do usuário (estavam sobre o rosto).
+- Pendente: confirmar com o usuário se o nome do responsável pelo Alibaba Cloud é "Pitt" ou "Pete".
+- Pendente: o kit está na branch `claude/video-use-setup-squgb8`, não na `main`. O Hermes Agent também usa este
+  repositório; abrir PR para a `main` só se o usuário pedir.
+- Créditos ElevenLabs (plano gratuito, 10.000): uso baixo até agora; conferir em `/v1/user/subscription`.
