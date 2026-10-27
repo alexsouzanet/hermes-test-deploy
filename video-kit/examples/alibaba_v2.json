@@ -1,0 +1,78 @@
+{
+  "name": "alibaba_v2",
+  "videos_dir": "/root/footage/video2",
+  "day": 2,
+  "place": "Hangzhou",
+  "title": {
+    "kicker": "Missão China",
+    "title": "Por dentro\ndo Alibaba"
+  },
+  "ranges": [
+    {
+      "source": "snapinsta-1793128402193",
+      "start": 1.04,
+      "end": 10.9
+    },
+    {
+      "source": "snapinsta-1793128402193",
+      "start": 11.24,
+      "end": 21.52
+    },
+    {
+      "source": "snapinsta-1793128402193",
+      "start": 33.18,
+      "end": 42.2
+    },
+    {
+      "source": "snapinsta-1793128402193",
+      "start": 43.32,
+      "end": 48.16
+    },
+    {
+      "source": "snapinsta-1793128402193",
+      "start": 55.94,
+      "end": 71.58
+    },
+    {
+      "source": "snapinsta-1793128402193",
+      "start": 71.98,
+      "end": 86.7
+    },
+    {
+      "source": "snapinsta-1793128402193",
+      "start": 118.12,
+      "end": 131.1
+    },
+    {
+      "source": "snapinsta-1793128402193",
+      "start": 141.24,
+      "end": 144.72
+    },
+    {
+      "source": "snapinsta-1793128402193",
+      "start": 150.44,
+      "end": 155.0
+    }
+  ],
+  "fixes": {
+    "Singapore": "Tsinghua",
+    "Pete": "Pitt",
+    "AI": "IA",
+    "brasileiros": "brasileiras"
+  },
+  "name_cards": [
+    {
+      "name": "Alexandre de Souza",
+      "role": "Gerente de Inovação · Sebrae/SC",
+      "at": 0.8
+    }
+  ],
+  "isolate_voice": true,
+  "auto_zoom": true,
+  "blur_band": [
+    0.72,
+    0.84
+  ],
+  "captions": "C",
+  "original_mix": 0.25
+}

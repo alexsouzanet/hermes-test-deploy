@@ -93,7 +93,7 @@ def chunk(words: list[dict], max_words: int, max_chars: int, min_dur: float = 0.
         gap = (nxt["start"] - w["end"]) if nxt else 0
         dur = w["end"] - cur[0]["start"]
         n = sum(len(x["text"].split()) for x in cur)
-        if (nxt is None or w["text"][-1] in punct or gap >= pause
+        if (nxt is None or w["text"][-1] in punct or gap >= pause or w.get("cut_after")
                 or n >= max_words + 1 or (n >= max_words and dur >= min_dur)):
             out.append(cur)
             cur = []

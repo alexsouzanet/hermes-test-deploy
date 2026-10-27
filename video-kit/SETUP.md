@@ -66,11 +66,12 @@ Antes do Dia 1: vídeo de embarque com `"tag_day": "Embarque", "place": "São Pa
 | Zoom de corte | Sim, alterna 100% / 118% nas pausas, trechos de no mínimo 2,2 s |
 | Cartão de nome | Sim, para quem fala (lista no briefing do Drive) |
 | Cor | **Neutra** (correção automática sutil, ±8%) |
-| Isolamento de voz | Sim, quando houver ruído (`"isolate_voice": true`; precisa de trechos ≥ 4,6 s) |
+| Isolamento de voz | Sim, quando houver ruído (`"isolate_voice": true`). Mistura 25% do som original (`"original_mix"`) + realce de presença, para a voz não ficar abafada |
 | Tradução | PT pequeno em cima, EN grande embaixo (`.ass` escrito à mão, passado em `"captions"`) |
 | Encerramento | Logo + "Missão China 2026 · SCALE IA" + @sebraestartups e @alexsouzanet, 2,8 s |
 | Música | **Nenhuma no arquivo.** Adicionada no app do Instagram (biblioteca livre de direitos), 10–15% do volume da voz |
 | Duração | Alvo pedido pelo usuário (30, 60 ou 90 s são os formatos usuais, não um limite) |
+| Cortes | **Só entre frases.** Não cortar gaguejos no meio da frase (fica truncado). Folga automática de até 0,2 s antes e 0,3 s depois, sem invadir palavras. Cada corte troca o enquadramento (100% ↔ 118%) |
 
 ## Fluxo de cada vídeo
 

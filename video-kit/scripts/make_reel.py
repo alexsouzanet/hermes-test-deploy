@@ -69,9 +69,9 @@ def find_source(videos_dir: Path, stem: str) -> Path:
     sys.exit(f"source not found: {stem} in {videos_dir}")
 
 
-def zoom_plan(words: list[dict], start: float, end: float) -> list[tuple[float, float]]:
+def zoom_plan(words: list[dict], start: float, end: float, z0: float = 1.0) -> list[tuple[float, float]]:
     """Alternate 1.0 / ZOOM_IN at silences, never closer than ZOOM_MIN_PIECE. Range-relative end times."""
-    cuts, last, z = [], start, 1.0
+    cuts, last, z = [], start, z0
     for a, b in zip(words, words[1:]):
         gap_mid = (a["end"] + b["start"]) / 2
         if b["start"] - a["end"] >= ZOOM_GAP and gap_mid - last >= ZOOM_MIN_PIECE and end - gap_mid >= ZOOM_MIN_PIECE:
@@ -97,6 +97,21 @@ def isolate(audio_in: Path, audio_out: Path) -> bool:
     return True
 
 
+BREATH_PRE, BREATH_POST, BREATH_MARGIN = 0.20, 0.30, 0.06
+
+
+def breathe(all_words: list[dict], start: float, end: float) -> tuple[float, float]:
+    """Extend a range into the surrounding silence (never into a neighbouring word) so cuts can breathe."""
+    prev_end = max((w["end"] for w in all_words if w["end"] <= start + 0.01), default=0.0)
+    next_start = min((w["start"] for w in all_words if w["start"] >= end - 0.01), default=end + BREATH_POST + 1)
+    new_start = min(start, max(prev_end + BREATH_MARGIN, start - BREATH_PRE, 0.0))
+    new_end = max(end, min(next_start - BREATH_MARGIN, end + BREATH_POST))
+    return new_start, new_end
+
+
+VOICE_EQ = "equalizer=f=3500:t=q:w=1.2:g=3,highshelf=f=8000:g=2"
+
+
 def isolated_track(src: Path, cache_dir: Path) -> Path | None:
     """Voice-isolate the whole source once (cached), so every range is clean whatever its length."""
     cache_dir.mkdir(parents=True, exist_ok=True)
@@ -112,7 +127,8 @@ def isolated_track(src: Path, cache_dir: Path) -> Path | None:
 
 def extract_range(src: Path, start: float, end: float, words: list[dict], out: Path, *,
                   auto_zoom: bool, clean_audio: Path | None, draft: bool,
-                  blur_band: tuple[float, float] | None = None) -> None:
+                  blur_band: tuple[float, float] | None = None, z0: float = 1.0,
+                  original_mix: float = 0.25) -> float:
     dur = end - start
     pre = TONEMAP_CHAIN + "," if is_hdr_source(src) else ""
     fill = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30"
@@ -127,7 +143,7 @@ def extract_range(src: Path, start: float, end: float, words: list[dict], out: P
               f"[bg][blur]overlay=0:H*{y0:.3f}[base]"]
     else:
         fc = [f"[0:v]{pre}{fill}[base]"]
-    cuts = zoom_plan(words, start, end) if auto_zoom else [(dur, 1.0)]
+    cuts = zoom_plan(words, start, end, z0) if auto_zoom else [(dur, 1.0)]
     fc.append(f"[base]split={len(cuts)}" + "".join(f"[s{i}]" for i in range(len(cuts))))
     for i, (t_end, z) in enumerate(cuts):
         t0 = 0.0 if i == 0 else cuts[i - 1][0]
@@ -135,14 +151,19 @@ def extract_range(src: Path, start: float, end: float, words: list[dict], out: P
         fc.append(f"[s{i}]trim={t0:.3f}:{t_end:.3f},setpts=PTS-STARTPTS{crop}[p{i}]")
     fc.append("".join(f"[p{i}]" for i in range(len(cuts))) + f"concat=n={len(cuts)}:v=1:a=0,{grade}[v]")
 
-    a_idx = 0
-    if clean_audio:
-        inputs += ["-ss", f"{start:.3f}", "-t", f"{dur:.3f}", "-i", str(clean_audio)]
-        a_idx = 1
     fades = f"afade=t=in:st=0:d=0.03,afade=t=out:st={dur - 0.03:.3f}:d=0.03"
-    fc.append(f"[{a_idx}:a]aresample=48000,aformat=channel_layouts=stereo,atrim=0:{dur:.3f},{fades}[a]")
+    if clean_audio:
+        # Isolated voice + some of the original room sound, so the voice is clean but not boxed in.
+        inputs += ["-ss", f"{start:.3f}", "-t", f"{dur:.3f}", "-i", str(clean_audio)]
+        fc.append(f"[1:a]aresample=48000,aformat=channel_layouts=stereo[iso]")
+        fc.append(f"[0:a]aresample=48000,aformat=channel_layouts=stereo,volume={original_mix}[room]")
+        fc.append(f"[iso][room]amix=inputs=2:normalize=0:duration=first,{VOICE_EQ},"
+                  f"atrim=0:{dur:.3f},{fades}[a]")
+    else:
+        fc.append(f"[0:a]aresample=48000,aformat=channel_layouts=stereo,atrim=0:{dur:.3f},{fades}[a]")
     run(["ffmpeg", "-nostdin", "-y", *inputs, "-filter_complex", ";".join(fc), "-map", "[v]", "-map", "[a]",
          "-t", f"{dur:.3f}", *enc(draft), str(out)])
+    return cuts[-1][1]
 
 
 def fix_token(tok: str, fixes: dict[str, str]) -> str:
@@ -183,7 +204,15 @@ def main() -> None:
     place_tag = f"{day_label} · {cfg['place']}"
 
     # 1. Talk ranges → body.mp4, and caption cues on the body timeline (Rule 5).
-    seg_paths, cue_words, offset = [], [], 0.0
+    # Neighbouring ranges of the same file with only a pause between them become one range (fewer cuts).
+    merged: list[dict] = []
+    for r in cfg["ranges"]:
+        if merged and merged[-1]["source"] == r["source"] and 0 <= r["start"] - merged[-1]["end"] < 0.6:
+            merged[-1] = {**merged[-1], "end": r["end"]}
+        else:
+            merged.append(dict(r))
+    cfg["ranges"] = merged
+    seg_paths, cue_words, offset, z_next = [], [], 0.0, 1.0
     for i, r in enumerate(cfg["ranges"]):
         src = find_source(vdir, r["source"])
         tr = tr_dir / f"{r['source']}.json"
@@ -193,13 +222,20 @@ def main() -> None:
         for w in words:  # per-video name fixes, e.g. {"COEN": "Qwen"} (exact token, punctuation kept)
             w["text"] = " ".join(fix_token(t, cfg.get("fixes", {})) for t in w["text"].split(" "))
         out = work / f"seg_{i:02d}.mp4"
-        print(f"  range {i}: {r['source']} {r['start']:.2f}-{r['end']:.2f} ({len(words)} words)")
+        start, end = r["start"], r["end"]
+        if cfg.get("breath", True):
+            all_words = [w for w in json.loads(tr.read_text())["words"] if w["type"] != "spacing"]
+            start, end = breathe(all_words, start, end)
+        print(f"  range {i}: {r['source']} {start:.2f}-{end:.2f} ({len(words)} words)")
         clean = isolated_track(src, edit / "isolated") if cfg.get("isolate_voice") else None
-        extract_range(src, r["start"], r["end"], words, out, auto_zoom=cfg.get("auto_zoom", True),
-                      clean_audio=clean, draft=args.draft, blur_band=cfg.get("blur_band"))
-        for w in words:
-            cue_words.append({**w, "start": w["start"] - r["start"] + offset, "end": w["end"] - r["start"] + offset})
-        offset += r["end"] - r["start"]
+        last_z = extract_range(src, start, end, words, out, auto_zoom=cfg.get("auto_zoom", True),
+                               clean_audio=clean, draft=args.draft, blur_band=cfg.get("blur_band"),
+                               z0=z_next, original_mix=cfg.get("original_mix", 0.25))
+        z_next = ZOOM_IN if last_z == 1.0 else 1.0  # every cut changes framing, so jumps read as intentional
+        for k, w in enumerate(words):  # a caption cue never spans a cut
+            cue_words.append({**w, "start": w["start"] - start + offset, "end": w["end"] - start + offset,
+                              "cut_after": k == len(words) - 1})
+        offset += end - start
         seg_paths.append(out)
     body_raw = work / "body_raw.mp4"
     concat(seg_paths, body_raw, tmp)
