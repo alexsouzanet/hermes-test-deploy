@@ -1,0 +1,21 @@
+{
+  "name": "embarque_60s",
+  "videos_dir": "/root/footage/embarque",
+  "tag_day": "Embarque",
+  "place": "Guarulhos",
+  "title": {"kicker": "Missão China", "title": "Rumo à\nChina"},
+  "ranges": [
+    {"source": "snapinsta-1793128295561", "start": 0.00, "end": 14.50},
+    {"source": "snapinsta-1793128295561", "start": 15.75, "end": 22.72},
+    {"source": "snapinsta-1793128295561", "start": 27.97, "end": 34.16},
+    {"source": "snapinsta-1793128295561", "start": 36.37, "end": 43.04},
+    {"source": "snapinsta-1793128295561", "start": 43.27, "end": 55.26},
+    {"source": "snapinsta-1793128295561", "start": 71.85, "end": 82.08}
+  ],
+  "fixes": {"Che-Chenghua": "Tsinghua", "Senha": "CEIA", "COEN": "Qwen", "Startup,": "Startups,"},
+  "name_cards": [{"name": "Alexandre de Souza", "role": "Gerente de Inovação · Sebrae/SC", "at": 0.8}],
+  "isolate_voice": true,
+  "auto_zoom": true,
+  "blur_band": [0.72, 0.84],
+  "captions": "C"
+}

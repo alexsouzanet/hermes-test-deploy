@@ -81,3 +81,10 @@ Antes do Dia 1: vídeo de embarque com `"tag_day": "Embarque", "place": "São Pa
    `~/Developer/video-use/.venv/bin/python scripts/make_reel.py reel.json` (use `--draft` para conferir cortes).
 5. Conferir quadros nos cortes, legendas e volume (−14 LUFS) antes de enviar.
 6. Entregar o MP4 na conversa e, se pedido, salvar na pasta **video-use** do Drive.
+
+Opções do JSON além do modelo (ver `examples/embarque_60s.json`):
+- `"fixes"`: nomes que a transcrição erra. Token exato vence (`{"Startup,": "Startups,"}` não mexe em "Startup Summit").
+  Erros já vistos: Tsinghua, CEIA, Qwen.
+- `"isolate_voice": true`: isola a voz do arquivo inteiro uma vez (cache em `edit/isolated/`) e depois corta.
+- `"blur_band": [0.72, 0.84]`: desfoca uma faixa da imagem (fração da altura), para esconder legenda antiga gravada no vídeo.
+- `"tag_day"`: texto no lugar de "Dia N" (ex.: "Embarque").

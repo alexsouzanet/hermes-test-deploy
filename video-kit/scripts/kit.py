@@ -43,7 +43,8 @@ def ease_in_out_cubic(t: float) -> float:
 # ---------------------------------------------------------------- transcript
 
 # Spoken → written Portuguese for captions only (audio stays as spoken).
-CORRECTIONS = {"cê": "você", "dum": "de um", "duma": "de uma", "sides": "side", "pra": "para"}
+CORRECTIONS = {"cê": "você", "dum": "de um", "duma": "de uma", "sides": "side", "pra": "para",
+               "pro": "para o", "pros": "para os", "tô": "estou", "tá": "está", "tamos": "estamos", "tão": "estão"}
 # Multi-word names that must never split across caption cues.
 KEEP_TOGETHER = [("startup", "summit"), ("summit", "week"), ("happy", "hour")]
 

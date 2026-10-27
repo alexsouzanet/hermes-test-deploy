@@ -97,15 +97,36 @@ def isolate(audio_in: Path, audio_out: Path) -> bool:
     return True
 
 
+def isolated_track(src: Path, cache_dir: Path) -> Path | None:
+    """Voice-isolate the whole source once (cached), so every range is clean whatever its length."""
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    out = cache_dir / f"{src.stem}.mp3"
+    if out.exists():
+        return out
+    wav = cache_dir / f"{src.stem}.wav"
+    run(["ffmpeg", "-nostdin", "-y", "-i", str(src), "-vn", "-ac", "1", "-ar", "48000", str(wav)])
+    ok = isolate(wav, out)
+    wav.unlink(missing_ok=True)
+    return out if ok else None
+
+
 def extract_range(src: Path, start: float, end: float, words: list[dict], out: Path, *,
-                  auto_zoom: bool, isolate_voice: bool, draft: bool, tmp: Path) -> None:
+                  auto_zoom: bool, clean_audio: Path | None, draft: bool,
+                  blur_band: tuple[float, float] | None = None) -> None:
     dur = end - start
     pre = TONEMAP_CHAIN + "," if is_hdr_source(src) else ""
     fill = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30"
     grade, _ = auto_grade_for_clip(src, start=start, duration=dur)
     grade = grade or "null"
     inputs = ["-ss", f"{start:.3f}", "-t", f"{dur:.3f}", "-i", str(src)]
-    fc = [f"[0:v]{pre}{fill}[base]"]
+    if blur_band:
+        # Hide captions already burned into the source (e.g. a re-used Instagram post).
+        y0, y1 = blur_band
+        fc = [f"[0:v]{pre}{fill},split[bg][bb]",
+              f"[bb]crop=iw:ih*{y1 - y0:.3f}:0:ih*{y0:.3f},boxblur=28:3[blur]",
+              f"[bg][blur]overlay=0:H*{y0:.3f}[base]"]
+    else:
+        fc = [f"[0:v]{pre}{fill}[base]"]
     cuts = zoom_plan(words, start, end) if auto_zoom else [(dur, 1.0)]
     fc.append(f"[base]split={len(cuts)}" + "".join(f"[s{i}]" for i in range(len(cuts))))
     for i, (t_end, z) in enumerate(cuts):
@@ -115,16 +136,21 @@ def extract_range(src: Path, start: float, end: float, words: list[dict], out: P
     fc.append("".join(f"[p{i}]" for i in range(len(cuts))) + f"concat=n={len(cuts)}:v=1:a=0,{grade}[v]")
 
     a_idx = 0
-    if isolate_voice and dur >= 4.6:
-        wav, clean = tmp / f"{out.stem}.wav", tmp / f"{out.stem}_iso.mp3"
-        run(["ffmpeg", "-nostdin", "-y", *inputs, "-vn", "-ac", "1", "-ar", "48000", str(wav)])
-        if isolate(wav, clean):
-            inputs += ["-i", str(clean)]
-            a_idx = 1
+    if clean_audio:
+        inputs += ["-ss", f"{start:.3f}", "-t", f"{dur:.3f}", "-i", str(clean_audio)]
+        a_idx = 1
     fades = f"afade=t=in:st=0:d=0.03,afade=t=out:st={dur - 0.03:.3f}:d=0.03"
     fc.append(f"[{a_idx}:a]aresample=48000,aformat=channel_layouts=stereo,atrim=0:{dur:.3f},{fades}[a]")
     run(["ffmpeg", "-nostdin", "-y", *inputs, "-filter_complex", ";".join(fc), "-map", "[v]", "-map", "[a]",
          "-t", f"{dur:.3f}", *enc(draft), str(out)])
+
+
+def fix_token(tok: str, fixes: dict[str, str]) -> str:
+    """Exact token (with punctuation) wins, e.g. {"Startup,": "Startups,"} leaves "Startup Summit" alone."""
+    if tok in fixes:
+        return fixes[tok]
+    core = tok.rstrip(".,?!;:")
+    return fixes[core] + tok[len(core):] if core in fixes else tok
 
 
 def card(frames: Path, dur: float, out: Path, draft: bool) -> None:
@@ -153,7 +179,8 @@ def main() -> None:
     shutil.rmtree(work, ignore_errors=True)
     work.mkdir(parents=True)
     tmp = Path(tempfile.mkdtemp())
-    place_tag = f"{cfg.get('tag_day', f'Dia {cfg['day']}')} · {cfg['place']}"
+    day_label = cfg.get("tag_day") or f"Dia {cfg.get('day')}"
+    place_tag = f"{day_label} · {cfg['place']}"
 
     # 1. Talk ranges → body.mp4, and caption cues on the body timeline (Rule 5).
     seg_paths, cue_words, offset = [], [], 0.0
@@ -163,10 +190,13 @@ def main() -> None:
         if not tr.exists():
             sys.exit(f"missing transcript {tr}. Run transcribe_batch.py on {vdir} first.")
         words = kit.load_words(tr, r["start"], r["end"])
+        for w in words:  # per-video name fixes, e.g. {"COEN": "Qwen"} (exact token, punctuation kept)
+            w["text"] = " ".join(fix_token(t, cfg.get("fixes", {})) for t in w["text"].split(" "))
         out = work / f"seg_{i:02d}.mp4"
         print(f"  range {i}: {r['source']} {r['start']:.2f}-{r['end']:.2f} ({len(words)} words)")
+        clean = isolated_track(src, edit / "isolated") if cfg.get("isolate_voice") else None
         extract_range(src, r["start"], r["end"], words, out, auto_zoom=cfg.get("auto_zoom", True),
-                      isolate_voice=cfg.get("isolate_voice", False), draft=args.draft, tmp=tmp)
+                      clean_audio=clean, draft=args.draft, blur_band=cfg.get("blur_band"))
         for w in words:
             cue_words.append({**w, "start": w["start"] - r["start"] + offset, "end": w["end"] - r["start"] + offset})
         offset += r["end"] - r["start"]
