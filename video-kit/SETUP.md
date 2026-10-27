@@ -1,5 +1,7 @@
 # Kit de vídeo · Missão China 2026 (SCALE IA)
 
+> Outro agente (Hermes, Codex) vai usar este kit? Leia `AGENTES.md`: ele traz o caminho para resultado idêntico e todos os valores exatos.
+
 Reels de 30, 60 ou 90 s para @alexsouzanet e @sebraestartups (mesmo vídeo, post em collab).
 Edição feita pelo skill [video-use](https://github.com/browser-use/video-use) + os gráficos deste kit.
 
@@ -53,8 +55,8 @@ Estilos de legenda em `scripts/kit.py`: **A** caixa alta 2–3 palavras, **B** f
 | 7 | 06/11 | Jiaxing |
 | 8 | 07/11 | Jiaxing → Xangai |
 
-Antes do Dia 1: vídeo de embarque com `"tag_day": "Embarque", "place": "São Paulo"`
-(selo "EMBARQUE · SÃO PAULO"). `tag_day` substitui "Dia N" em qualquer vídeo fora do roteiro.
+Antes do Dia 1: vídeo de embarque com `"tag_day": "Embarque", "place": "Guarulhos"`
+(selo "EMBARQUE · GUARULHOS"). `tag_day` substitui "Dia N" em qualquer vídeo fora do roteiro.
 
 ## Aprovações (27/10/2026)
 
@@ -63,7 +65,7 @@ Antes do Dia 1: vídeo de embarque com `"tag_day": "Embarque", "place": "São Pa
 | Abertura | Cartão de título (símbolo, kicker, título em até 3 linhas, selo do dia), 2,4 s |
 | Legenda | **C · karaokê**: caixa alta, 2–3 palavras, palavra falada em `#40B9FF` |
 | Selo de local | Sim, nos primeiros 6 s da fala |
-| Zoom de corte | Sim, alterna 100% / 118% nas pausas, trechos de no mínimo 2,2 s |
+| Zoom de corte | Sim, alterna 100% / 118% em toda emenda e nas pausas ≥ 0,18 s, trechos de no mínimo 2,2 s |
 | Cartão de nome | Sim, para quem fala (lista no briefing do Drive) |
 | Cor | **Neutra** (correção automática sutil, ±8%) |
 | Isolamento de voz | Sim, quando houver ruído (`"isolate_voice": true`). Mistura 25% do som original (`"original_mix"`) + realce de presença, para a voz não ficar abafada |
