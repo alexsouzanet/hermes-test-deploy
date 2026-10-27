@@ -1,0 +1,33 @@
+{
+  "name": "alibaba_85s",
+  "videos_dir": "/root/footage/video2",
+  "day": 2,
+  "place": "Hangzhou",
+  "title": {"kicker": "Missão China", "title": "Por dentro\ndo Alibaba"},
+  "ranges": [
+    {"source": "snapinsta-1793128402193", "start": 1.00, "end": 4.83},
+    {"source": "snapinsta-1793128402193", "start": 5.18, "end": 7.70},
+    {"source": "snapinsta-1793128402193", "start": 8.10, "end": 10.98},
+    {"source": "snapinsta-1793128402193", "start": 11.20, "end": 17.44},
+    {"source": "snapinsta-1793128402193", "start": 19.90, "end": 21.60},
+    {"source": "snapinsta-1793128402193", "start": 33.13, "end": 38.82},
+    {"source": "snapinsta-1793128402193", "start": 39.18, "end": 40.66},
+    {"source": "snapinsta-1793128402193", "start": 41.10, "end": 42.22},
+    {"source": "snapinsta-1793128402193", "start": 43.29, "end": 48.20},
+    {"source": "snapinsta-1793128402193", "start": 55.90, "end": 71.62},
+    {"source": "snapinsta-1793128402193", "start": 71.94, "end": 84.96},
+    {"source": "snapinsta-1793128402193", "start": 85.76, "end": 86.74},
+    {"source": "snapinsta-1793128402193", "start": 118.10, "end": 120.96},
+    {"source": "snapinsta-1793128402193", "start": 121.82, "end": 122.54},
+    {"source": "snapinsta-1793128402193", "start": 123.88, "end": 131.10},
+    {"source": "snapinsta-1793128402193", "start": 141.21, "end": 144.76},
+    {"source": "snapinsta-1793128402193", "start": 150.40, "end": 153.15},
+    {"source": "snapinsta-1793128402193", "start": 153.33, "end": 155.06}
+  ],
+  "fixes": {"Singapore": "Tsinghua", "Pete": "Pitt", "AI": "IA", "brasileiros": "brasileiras"},
+  "name_cards": [{"name": "Alexandre de Souza", "role": "Gerente de Inovação · Sebrae/SC", "at": 0.8}],
+  "isolate_voice": true,
+  "auto_zoom": true,
+  "blur_band": [0.72, 0.84],
+  "captions": "C"
+}

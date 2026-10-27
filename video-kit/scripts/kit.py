@@ -163,8 +163,13 @@ def _clean_caps(text: str) -> str:
     return text.rstrip(",;:.").upper() if not text.endswith("?") else text.upper()
 
 
+# Tag-question fillers dropped from captions only (the audio keeps them).
+CAPTION_SKIP = {"né"}
+
+
 def captions_ass(words: list[dict], style: str, t0: float, out: Path) -> int:
     """Write an ASS file for one block. t0 = source time that maps to block time 0."""
+    words = [w for w in words if re.sub(r"\W", "", w["text"]).lower() not in CAPTION_SKIP]
     lines = []
     if style == "A":
         for c in chunk(words, 2, 16):
